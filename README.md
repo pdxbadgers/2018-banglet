@@ -9,6 +9,8 @@ Original concept and board design: @nishakm / @nishakmr
 
 PCB necromancy: @r00tkillah
 
+Assistant necromancy: @securelyfitz, @office_deskjet
+
 Code monkey: @pierce403 / @deanpierce
 
 3D banglet design: @jonhannis
