@@ -5,14 +5,28 @@ Here we are, another crazy year, another crazy party badge.  Necks are so over-u
 credits (github/twitter)
 ------------------------
 
-Original concept and board design: @nishakm / @nishakmr
+Original Concept:
+* @nishakm / @nishakmr
 
-PCB necromancy: @r00tkillah
+Board Design:
+* @nishakm / @nishakmr
+* @r00tkillah
 
-Assistant necromancy: @securelyfitz, @office_deskjet
+3D Design:
+* @jonhannis
+* @pierce403 / @deanpierce
 
-Code monkey: @pierce403 / @deanpierce
+PCB necromancers:
+* @r00tkillah
+* @securelyfitz
+* @office_deskjet
+* @nishakm / @nishakmr
+* @jonhannis
 
-3D banglet design: @jonhannis
+Code monkeys:
+* @pierce403 / @deanpierce
+* @nishakm / @nishakmr
+
+Special thanks to Adafruit Industries for publishing their board designs, 3D designs and NRF52 Arduino code examples.
 
 And a special thanks to everyone else who donated time, money, or crazy ideas that helped make this possible.
