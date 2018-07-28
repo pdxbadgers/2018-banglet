@@ -110,7 +110,7 @@ int find_mac(uint8_t* mac)
 
 void scan_callback(ble_gap_evt_adv_report_t* report)
 {
-  Serial.println("got callback");
+  //Serial.println("got callback");
   uint8_t new_thing[6]; 
   memcpy(new_thing,report->peer_addr.addr,6);
   //Serial.println("copied MAC buffer");
@@ -120,12 +120,15 @@ void scan_callback(ble_gap_evt_adv_report_t* report)
   int thing = find_mac(new_thing);
   //Serial.printf("found thing %d\n",thing);
 
-  memset(seen_names[thing],0,32); 
-  if(Bluefruit.Scanner.parseReportByType(report, BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME, seen_names[thing], 32))
+  uint8_t new_name[32];
+  memset(new_name,0,32); 
+  if(Bluefruit.Scanner.parseReportByType(report, BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME, new_name, 32))
   {
-    Serial.printf("%14s %s\n", "NAME", seen_names[thing]);
-    //seen_names[thing]=new_name;
-    //memset(buffer, 0, sizeof(buffer));
+    if(strlen((char*)new_name)>0)
+    {
+      memset(seen_names[thing],0,32);
+      memcpy(seen_names[thing],new_name,32);
+    }
   }
 
   Serial.println();
@@ -216,7 +219,7 @@ void fire()
 
 void loop()
 {
-  Serial.write("loop! ");
+  //Serial.write("loop! ");
   delay(1000);
 
   if(mode.equals("btscan"))btscan();
