@@ -1,12 +1,9 @@
 /*********************************************************************
  This is an example for our nRF52 based Bluefruit LE modules
-
  Pick one up today in the adafruit shop!
-
  Adafruit invests time and resources providing this open source code,
  please support Adafruit and open-source hardware by purchasing
  products from Adafruit!
-
  MIT license, check LICENSE for more information
  All text above, and the splash screen below must be included in
  any redistribution
@@ -205,6 +202,7 @@ void fire()
 
 void loop()
 {
+  mode.trim();
   if(mode.equals("btscan"))btscan();
   if(mode.equals("fire"))fire();
   
@@ -241,6 +239,7 @@ void loop()
           mode.trim();
 
           bleuart.write("MODE CHANGED TO : '");
+          memset(mode_chars,0,20);
           mode.toCharArray(mode_chars,20);
           bleuart.write(mode_chars);
           bleuart.write("'\n");
