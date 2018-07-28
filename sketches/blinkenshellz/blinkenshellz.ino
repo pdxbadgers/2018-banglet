@@ -29,9 +29,9 @@ String mode="btscan"; // set the default mode
 #define PIN A0
 
 uint seen=0;
-
-const byte MAX_MACS = 100;
-uint8_t* seen_macs[MAX_MACS]; 
+const byte MAX_MACS = 24;
+uint8_t seen_macs[6][MAX_MACS]; 
+uint8_t seen_names[32][MAX_MACS];
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(13, PIN, NEO_GRB + NEO_KHZ800);
 
@@ -65,10 +65,12 @@ void setup()
   Bluefruit.setConnectCallback(connect_callback);
   Bluefruit.setDisconnectCallback(disconnect_callback);
 
+
   // Start Central Scan
   Bluefruit.setConnLedInterval(250);
   Bluefruit.Scanner.setRxCallback(scan_callback);
   Bluefruit.Scanner.start(0);
+
 
   // Configure and Start Device Information Service
   bledis.setManufacturer("Adafruit Industries");
@@ -89,6 +91,7 @@ void setup()
   Serial.println("Once connected, enter character(s) that you wish to send");
 }
 
+// TODO make this work when seen > MAX_MACS
 int find_mac(uint8_t* mac)
 {
   for(int i=0;i<seen;++i)
@@ -98,21 +101,38 @@ int find_mac(uint8_t* mac)
       return i;
     }
   }
-  seen_macs[seen]=mac;
+  //seen_macs[seen]=mac;
+  memcpy(seen_macs[seen],mac,6);
   seen++;
+
+  return seen-1;
 }
 
 void scan_callback(ble_gap_evt_adv_report_t* report)
 {
-  uint8_t* new_thing = new uint8_t[6]; 
+  Serial.println("got callback");
+  uint8_t new_thing[6]; 
   memcpy(new_thing,report->peer_addr.addr,6);
-
-  int thing = find_mac(new_thing);
+  //Serial.println("copied MAC buffer");
   
+  // which device is this?
+  //Serial.println("finding thing");
+  int thing = find_mac(new_thing);
+  //Serial.printf("found thing %d\n",thing);
+
+  memset(seen_names[thing],0,32); 
+  if(Bluefruit.Scanner.parseReportByType(report, BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME, seen_names[thing], 32))
+  {
+    Serial.printf("%14s %s\n", "NAME", seen_names[thing]);
+    //seen_names[thing]=new_name;
+    //memset(buffer, 0, sizeof(buffer));
+  }
+
   Serial.println();
   for ( int i = 0 ; i < seen; ++i)
   {
     Serial.printBufferReverse(seen_macs[i], 6, ':');
+    Serial.printf(" : %s",seen_names[i]);
     Serial.println();
   }
   
@@ -159,9 +179,6 @@ void startAdv(void)
 
 void btscan()
 {
-  
-  delay(1000);
-  
   uint i = 0;
 
   // light up the LEDs
@@ -181,10 +198,7 @@ void btscan()
 int counter = 0; // this is fine
 
 void fire()
-{
-  
-    delay(1000);
-   
+{   
     uint32_t first=strip.Color(128,0,0);
     uint32_t second=strip.Color(172,0,0);
     uint32_t third=strip.Color(255,0,0);
@@ -202,7 +216,9 @@ void fire()
 
 void loop()
 {
-  mode.trim();
+  Serial.write("loop! ");
+  delay(1000);
+
   if(mode.equals("btscan"))btscan();
   if(mode.equals("fire"))fire();
   
@@ -211,7 +227,8 @@ void loop()
   {
     char command[80];
     char mode_chars[20];
-    
+
+    memset(command,0,80);
     bleuart.read(command,80);
     
     Serial.write(command);
@@ -230,6 +247,7 @@ void loop()
        if(0==strchr(command,' '))
        {
          bleuart.write("MODE : ");
+         memset(mode_chars,0,20);
          mode.toCharArray(mode_chars,20);
          bleuart.write(mode_chars);
        }
