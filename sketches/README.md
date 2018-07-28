@@ -1,7 +1,10 @@
 Welcome to the 503 Party
 ------------------------
-So, you have a 503 banglet, now what?  You may notice a striking similarity to the Adafruit Feather.  This is because the banglet board pretty much a Feather modified with some extra banglety goodies.  These instructions will take you through flashing your own custom arduino sketch to your banglet.
+So, you have a 503 banglet, now what?  You may notice a striking similarity to the Adafruit Feather.  This is because the banglet board is pretty much a Feather modified to fit the banglet form factor. What that means is that A0 is the only data pin you have access to and it goes straight to a neopixel strip. But you still have the whole suite of BT functionality that the Nordic NRF52 SoC has to offer. So you'll have to get creative with encoding your data into blinky lights ;).
 
+Adafruit has a good collection of examples to get you started with writing your custom sketch. You can clone their repo here: https://github.com/adafruit/Adafruit_NRF52_Arduino
+
+These instructions will take you through flashing your own custom arduino sketch to your banglet.
 
 Installing the Feather board definitions
 ----------------------------------------
