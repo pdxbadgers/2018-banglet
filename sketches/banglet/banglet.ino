@@ -263,7 +263,9 @@ void parseCommand(uint8_t *buf, int bufsize)
       bleuart.write("Invalid option\n");
     }
   }else{
-    bleuart.write("Send /list for list of commands. All commands start with /\n");
+    bleuart.write("Send /list for list of ");
+    bleuart.write("commands. All commands ");
+    bleuart.write("start with /\n");
   }
 }
 
@@ -420,18 +422,24 @@ uint8_t blue(uint32_t c) {
 void off()
 {
   bleuart.write("Turning off the lights\n");
+  turnOff();
+}
+
+void turnOff()
+{
   for(int i=0; i<strip.numPixels(); i++)
   {
     strip.setPixelColor(i, 0, 0, 0);
   }
   strip.show();
-  
 }
 
 // scan close by BT devices
 void scan()
 {
-  bleuart.write("Sneaky!\n");
+  turnOff();
+  bleuart.write("Showing nearby ");
+  bleuart.write("bluetooth devices...\n");
   bleuart.flush();
   while(bleuart.peek() == -1) btscan();
 }
