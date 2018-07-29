@@ -72,8 +72,15 @@ void setup()
   Bluefruit.begin();
   // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
   Bluefruit.setTxPower(4);
-  Bluefruit.setName(strcat("POTATO HAX ",getMcuUniqueID()));
+
+  char banglet_name[32];
+  memset(banglet_name,0,32);
+  sprintf(banglet_name,"503BANGLET %s",getMcuUniqueID());
+  Bluefruit.setName(banglet_name);
+  
   //Bluefruit.setName(getMcuUniqueID()); // useful testing with multiple central connections
+  Serial.print("ID IS : ");
+  Serial.println(getMcuUniqueID());
   Bluefruit.setConnectCallback(connect_callback);
   Bluefruit.setDisconnectCallback(disconnect_callback);
 
@@ -140,6 +147,7 @@ void scan_callback(ble_gap_evt_adv_report_t* report)
     }
   }
 
+  /* 
   Serial.println();
   for ( int i = 0 ; i < seen; ++i)
   {
@@ -151,7 +159,7 @@ void scan_callback(ble_gap_evt_adv_report_t* report)
   Serial.printf("device: %d  ",thing);
   Serial.printf("num seen: %d ",seen);
   Serial.println();
-  
+  */
 }
 
 
@@ -315,8 +323,8 @@ void connect_callback(uint16_t conn_handle)
   Serial.print("Connected to ");
   Serial.println(central_name);
 
-  //bleuart.write("WELCOME TO BANGLETOS!\n");
-  //bleuart.flush();
+  bleuart.write("WELCOME TO BANGLETOS!\n");
+  bleuart.flush();
 }
 
 void disconnect_callback(uint16_t conn_handle, uint8_t reason)
