@@ -230,7 +230,7 @@ void loop()
   
   // Forward from BLEUART to HW Serial
   while ( bleuart.available() )
-  {
+  { 
     char command[80];
     char mode_chars[20];
 
@@ -269,13 +269,38 @@ void loop()
           bleuart.write("'\n");
        }
     }
+    else if(0==strncmp(command,"list",4))
+    {
+      for ( int i = 0 ; i < seen; ++i)
+      {
+        char macbuf[20];
+        char namebuf[32];
+        memset(macbuf,0,20);
+        memset(namebuf,0,32);
+
+        sprintf(macbuf,"%02X:%02X:%02X:%02X:%02X:%02X ",seen_macs[i][5],seen_macs[i][4],seen_macs[i][3],seen_macs[i][2],seen_macs[i][1],seen_macs[i][0]);
+        sprintf(namebuf,"%s\n",seen_names[i]);
+        Serial.printBufferReverse(seen_macs[i], 6, ':');
+
+        bleuart.write(macbuf);
+        bleuart.write(namebuf);
+      }
+    }
+    else if(0==strncmp(command,"count",5))
+    {
+      char outbuf[20];
+      memset(outbuf,0,20);
+      
+      sprintf(outbuf,"%d Devices Logged\n",seen);
+      bleuart.write(outbuf);
+    }
     else
     {
        bleuart.write("UNKNOWN COMMAND,");
        bleuart.write(" TYPE 'HELP' FOR HELP");
     }
     
-    bleuart.write("\n#\n");
+    bleuart.write("\n# ");
   }
 
   // Request CPU to enter low-power mode until an event/interrupt occurs
