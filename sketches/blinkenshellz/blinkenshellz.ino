@@ -27,21 +27,33 @@ String mode="btscan"; // set the default mode
 #endif
 
 #define PIN A0
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(12, PIN, NEO_GRB + NEO_KHZ800);
 
+// MAC addr stuff
 uint seen=0;
 const byte MAX_MACS = 24;
-uint8_t seen_macs[6][MAX_MACS]; 
-uint8_t seen_names[32][MAX_MACS];
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(13, PIN, NEO_GRB + NEO_KHZ800);
+uint8_t* seen_macs[MAX_MACS];
+uint8_t* seen_names[MAX_MACS];
 
 void setup()
 {
+  Serial.begin(115200);
+
+  // allocate some buffers
+  for(int i=0;i<MAX_MACS;++i)
+  {
+    uint8_t* new_thing = new uint8_t[6];
+    uint8_t* new_name  = new uint8_t[32];  
+    memset(new_thing,0,6);
+    memset(new_name,0,32);
+    seen_macs[i]=new_thing;
+    seen_names[i]=new_name;
+  }
+  
   strip.begin();
   strip.setBrightness(16);
   strip.show(); // Initialize all pixels to 'off'
-
-  Serial.begin(115200);
 
   // Initialize blinkTimer for 1000 ms and start it
   blinkTimer.begin(1000, blink_timer_callback);
@@ -65,12 +77,10 @@ void setup()
   Bluefruit.setConnectCallback(connect_callback);
   Bluefruit.setDisconnectCallback(disconnect_callback);
 
-
   // Start Central Scan
   Bluefruit.setConnLedInterval(250);
   Bluefruit.Scanner.setRxCallback(scan_callback);
   Bluefruit.Scanner.start(0);
-
 
   // Configure and Start Device Information Service
   bledis.setManufacturer("Adafruit Industries");
@@ -87,11 +97,10 @@ void setup()
   // Set up and start advertising
   startAdv();
 
-  Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
-  Serial.println("Once connected, enter character(s) that you wish to send");
+  Serial.println("Welcome to the BangletOS debug console.");
+  Serial.println("Please press any key just for fun.");
 }
 
-// TODO make this work when seen > MAX_MACS
 int find_mac(uint8_t* mac)
 {
   for(int i=0;i<seen;++i)
@@ -102,7 +111,7 @@ int find_mac(uint8_t* mac)
     }
   }
   //seen_macs[seen]=mac;
-  memcpy(seen_macs[seen],mac,6);
+  memcpy(seen_macs[seen%MAX_MACS],mac,6);
   seen++;
 
   return seen-1;
@@ -141,14 +150,8 @@ void scan_callback(ble_gap_evt_adv_report_t* report)
   
   Serial.printf("device: %d  ",thing);
   Serial.printf("num seen: %d ",seen);
-
-  // Check if advertising contain BleUart service
-  if ( Bluefruit.Scanner.checkReportForUuid(report, BLEUART_UUID_SERVICE) )
-  {
-    Serial.println("BLE UART service detected");
-  }
-
   Serial.println();
+  
 }
 
 
@@ -182,17 +185,17 @@ void startAdv(void)
 
 void btscan()
 {
-  uint i = 0;
-
   // light up the LEDs
   int first=0;
   if(seen>12)first=seen-12;
   
-  for ( i = first ; i < seen; ++i)
+  for ( uint i=0 ; i < 12; ++i)
   {
-    //uint32_t color = strip.Color(seen_addrs[i][0],seen_addrs[i][1],seen_addrs[i][2]);
-    uint32_t color = strip.Color(seen_macs[i][5],seen_macs[i][4],seen_macs[i][3]);
-    strip.setPixelColor(i-first, color);
+    uint32_t color=0;
+    
+    if(i>seen)color=strip.Color(0,0,0);
+    else color = strip.Color(seen_macs[(first+i)%MAX_MACS][5],seen_macs[(first+i)%MAX_MACS][4],seen_macs[(first+i)%MAX_MACS][3]);
+    strip.setPixelColor(i, color);
   }
 
   strip.show();
