@@ -51,8 +51,8 @@ BLEUart bleuart;
 // List of commands
 // Add command name here and make sure the MAX_COMM value matches the number of commands
 const int MAX_COMM_LEN = 10;
-const int MAX_COMM = 5;
-const char commands[MAX_COMM][MAX_COMM_LEN] = {"list", "rainbow", "patriot", "off", "scan"};
+const int MAX_COMM = 6;
+const char commands[MAX_COMM][MAX_COMM_LEN] = {"list", "rainbow", "patriot", "off", "scan", "frozen"};
 
 
 // BT device scan
@@ -352,6 +352,7 @@ void doOption(int index)
   if(index == 2) patriot();
   if(index == 3) off();
   if(index == 4) scan();
+  if(index == 5) frozen();
 }
 
 
@@ -506,3 +507,34 @@ void btscan()
 
   strip.show();
 }
+
+//frozen
+void frozen()
+{
+  bleuart.write("Let it go!\n");
+  bleuart.flush();
+  while(bleuart.peek() == -1) blueScaleFade(200);
+}
+
+void blueScaleFade(uint8_t wait)
+{
+  //loop through fade values
+  
+  // divide the neopixel strip into 3 equal parts
+  for(int i=0; i< strip.numPixels(); i=i+3)
+  {
+    // find a color for this set
+     uint32_t color = strip.Color(random(0, 181), random(0, 256), random(100, 256));
+     // set the color
+     for(int j=i; j<i+3; j++)
+     {
+        if(j<strip.numPixels())
+        {
+          strip.setPixelColor(j, color);
+        }
+     }
+  }
+  strip.show();
+  delay(wait);
+}
+
