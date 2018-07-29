@@ -64,33 +64,74 @@ uint8_t* seen_macs[MAX_MACS];
 // neopixel
 #define N_LEDS 10
 #define PIN    A0
+#define UNCONNECTED A1
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
+// unique names
+const String first[] = {"Blubberbutt",
+                        "Benedict",
+                        "Benadryl",
+                        "Benchathis",
+                        "Bonapart",
+                        "Brokenbrick",
+                        "Boppinstick",
+                        "Benefit",
+                        "Sissorkick",
+                        "Backitup",
+                        "Beezlebub",
+                        "Burgerking",
+                        "Blenderdick",
+                        "Billiardball",
+                        "Guiltyverdict",
+                        "Beaniebaby",
+                        "Pythondict",
+                        "Carrotstick",
+                        "Baseballmitt",
+                        "SpectreMelt",
+                        "Bunsenburner",
+                        "Bengaltiger",
+                        "Budapest",
+                        "Bubbagump",
+                        "Happypath",
+                        "Badgerlife"};
 
-byte neopix_gamma[] = {
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
-    1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
-    2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
-    5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
-   10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
-   17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
-   25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
-   37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
-   51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
-   69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
-   90, 92, 93, 95, 96, 98, 99,101,102,104,105,107,109,110,112,114,
-  115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,
-  144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
-  177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
-  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
-
+const String second[] = {"Calldispatch",
+                         "Cunningscratch",
+                         "Cumberbadge",
+                         "Lumberjack",
+                         "Bandersnatch",
+                         "Flubbercrack",
+                         "Cumberbatch",
+                         "Cuttlefish",
+                         "Mantishrimp",
+                         "Slumberbelch",
+                         "Cupboardlatch",
+                         "Combyourthatch",
+                         "Snootybrat",
+                         "Cricketbat",
+                         "Johnnycash",
+                         "Zuckerberg",
+                         "Custardbatch",
+                         "Thundercat",
+                         "Alderan",
+                         "Candygram",
+                         "Uptoscratch",
+                         "Benderbadge",
+                         "Compassmap",
+                         "Memoryleak",
+                         "Bustarhymes",
+                         "Covertrack"};
 
 /*
  * Initial setup
  */
 void setup()
 {
+  // create banglet's name
+  randomSeed(analogRead(UNCONNECTED));
+  String banglet_name = first[random(0, 26)] + " " + second[random(0,26)];
+  char char_b_name[30];
+  banglet_name.toCharArray(char_b_name, 30);
   // setup serial
   Serial.begin(115200);
   Serial.println("Welcome to your Banglet!");
@@ -104,7 +145,7 @@ void setup()
   Bluefruit.begin();
   // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
   Bluefruit.setTxPower(4);
-  Bluefruit.setName(strcat("Banglet-", getMcuUniqueID()));
+  Bluefruit.setName(char_b_name);
   Bluefruit.setConnectCallback(connect_callback);
   Bluefruit.setDisconnectCallback(disconnect_callback);
 
@@ -164,6 +205,7 @@ int find_mac(uint8_t* mac)
   }
   seen_macs[seen]=mac;
   seen++;
+  return seen-1;
 }
 
 // scan callback function which prints out mac
