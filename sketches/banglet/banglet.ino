@@ -70,7 +70,7 @@ uint8_t* seen_names[MAX_MACS];
 
 
 // neopixel
-#define N_LEDS 10
+#define N_LEDS 12
 #define PIN    A0
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_LEDS, PIN, NEO_GRB + NEO_KHZ800);
