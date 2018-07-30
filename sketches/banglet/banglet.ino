@@ -261,18 +261,6 @@ void scan_callback(ble_gap_evt_adv_report_t* report)
  */
 void loop()
 {
-  // Forward data from HW Serial to BLEUART
-  // This doesn't actually work but seems to be needed to initialize the buffer correctly
-  while (Serial.available())
-  {
-    // Delay to wait for enough input, since we have a limited transmission buffer
-    delay(2);
-
-    uint8_t buf[64];
-    int count = Serial.readBytes(buf, sizeof(buf));
-    bleuart.write( buf, count );
-  }
-
   // Forward from BLEUART to HW Serial
   while ( bleuart.available() )
   {
@@ -311,9 +299,9 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
  */
 void parseCommand(uint8_t *buf, int bufsize)
 {
-  //for(int i=0; i<bufsize; i++){
-  //  Serial.write(buf[i]); 
-  //}
+  for(int i=0; i<bufsize; i++){
+    Serial.write(buf[i]); 
+  }
   if(buf[0] == '/'){
     int index = getCommand(buf);
     if(index != -1)
@@ -336,20 +324,21 @@ int getCommand(uint8_t *buf)
   int buf_end = 1;
   while(buf[buf_end] != '\n')
   {
-   // Serial.println((char)buf[buf_end]);
+    Serial.println((char)buf[buf_end]);
     buf_end++;
   }
-  // for some reason there are some undetermined characters at the end
-  // so shortend the length by this amount which is was found out through
-  // experimentation - yes I don't know what is going on here
-  buf_end = buf_end - 2;
+  // This is assuming the EOL character is a newline
+  // This will not work for any other case
+  // The default for the Adafruit UART interface is '\n'
+  buf_end = buf_end - 1;
   //Serial.println(buf_end);
   
   //go through each command
   for(int i=0; i<MAX_COMM; i++)
   {
-    //Serial.println(commands[i]);
-    //Serial.println((char *)buf);
+    Serial.println(commands[i]);
+    Serial.println((char *)buf);
+    Serial.println(buf_end);
     //check if the buffer command is the same
     if(strncmp(commands[i], (char *)++buf, buf_end) == 0)
     {
