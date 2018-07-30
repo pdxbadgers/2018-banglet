@@ -51,8 +51,15 @@ BLEUart bleuart;
 // List of commands
 // Add command name here and make sure the MAX_COMM value matches the number of commands
 const int MAX_COMM_LEN = 10;
-const int MAX_COMM = 7;
-const char commands[MAX_COMM][MAX_COMM_LEN] = {"list", "rainbow", "patriot", "off", "scan", "frozen", "devices"};
+const int MAX_COMM = 8;
+const char commands[MAX_COMM][MAX_COMM_LEN] = {"list",
+                                               "rainbow",
+                                               "patriot",
+                                               "off",
+                                               "scan",
+                                               "frozen",
+                                               "devices",
+                                               "counts"};
 
 
 // BT device scan
@@ -361,6 +368,7 @@ void doOption(int index)
   if(index == 4) scan();
   if(index == 5) frozen();
   if(index == 6) devices();
+  if(index == 7) counts();
 }
 
 
@@ -568,5 +576,21 @@ void listNames()
     bleuart.write(macbuf);
     bleuart.write(namebuf);
   }
+}
+
+//show number of devices
+void counts()
+{
+  bleuart.write("Number of nearby devices:\n");
+  bleuart.flush();
+  while(bleuart.peek() == -1) numDevices();
+}
+
+void numDevices()
+{
+  char outbuf[20];
+  memset(outbuf,0,20);
+  sprintf(outbuf,"%d Devices Logged\n",seen);
+  bleuart.write(outbuf);
 }
 
