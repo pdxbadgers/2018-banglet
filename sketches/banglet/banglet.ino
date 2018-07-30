@@ -57,14 +57,15 @@ const char commands[MAX_COMM][MAX_COMM_LEN] = {"list", "rainbow", "patriot", "of
 
 // BT device scan
 uint seen=0;
-const byte MAX_MACS = 100;
-uint8_t* seen_macs[MAX_MACS]; 
+const byte MAX_MACS = 24;
+uint8_t* seen_macs[MAX_MACS];
+uint8_t* seen_names[MAX_MACS];
 
 
 // neopixel
 #define N_LEDS 10
 #define PIN    A0
-#define UNCONNECTED A1
+
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
 // unique names
@@ -129,6 +130,17 @@ void setup()
   // setup strip
   stripInit();
 
+  // allocate some buffers
+  for(int i=0;i<MAX_MACS;++i)
+  {
+    uint8_t* new_thing = new uint8_t[6];
+    uint8_t* new_name  = new uint8_t[32];  
+    memset(new_thing,0,6);
+    memset(new_name,0,32);
+    seen_macs[i]=new_thing;
+    seen_names[i]=new_name;
+  }
+
   // Config the peripheral connection with maximum bandwidth 
   // more SRAM required by SoftDevice
   // Note: All config***() function must be called before begin()
@@ -188,6 +200,7 @@ void startAdv(void)
 // show that the strip is on
 void stripInit(){
   strip.begin();
+  strip.setBrightness(16);
   for(int i=0;i<strip.numPixels(); i++){
     strip.setPixelColor(i, strip.Color(255, 0, 0));
     strip.show();
@@ -208,8 +221,10 @@ int find_mac(uint8_t* mac)
       return i;
     }
   }
-  seen_macs[seen]=mac;
+  //seen_macs[seen]=mac;
+  memcpy(seen_macs[seen%MAX_MACS],mac,6);
   seen++;
+
   return seen-1;
 }
 
@@ -217,28 +232,26 @@ int find_mac(uint8_t* mac)
 // addresses in a readable way
 void scan_callback(ble_gap_evt_adv_report_t* report)
 {
-  uint8_t* new_thing = new uint8_t[6]; 
+  uint8_t new_thing[6]; 
   memcpy(new_thing,report->peer_addr.addr,6);
-
+  //Serial.println("copied MAC buffer");
+  
+  // which device is this?
+  //Serial.println("finding thing");
   int thing = find_mac(new_thing);
-  
-  Serial.println();
-  for ( int i = 0 ; i < seen; ++i)
-  {
-    Serial.printBufferReverse(seen_macs[i], 6, ':');
-    Serial.println();
-  }
-  
-  Serial.printf("device: %d  ",thing);
-  Serial.printf("num seen: %d ",seen);
+  //Serial.printf("found thing %d\n",thing);
 
-  // Check if advertising contain BleUart service
-  if ( Bluefruit.Scanner.checkReportForUuid(report, BLEUART_UUID_SERVICE) )
+  uint8_t new_name[32];
+  memset(new_name,0,32); 
+  if(Bluefruit.Scanner.parseReportByType(report, BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME, new_name, 32))
   {
-    Serial.println("BLE UART service detected");
+    if(strlen((char*)new_name)>0)
+    {
+      memset(seen_names[thing],0,32);
+      memcpy(seen_names[thing],new_name,32);
+    }
   }
 
-  Serial.println();
 }
 
 
@@ -496,18 +509,16 @@ void btscan()
 {
   
   delay(1000);
-  
-  uint i = 0;
-
-  // light up the LEDs
   int first=0;
   if(seen>12)first=seen-12;
   
-  for ( i = first ; i < seen; ++i)
+  for ( uint i=0 ; i < 12; ++i)
   {
-    //uint32_t color = strip.Color(seen_addrs[i][0],seen_addrs[i][1],seen_addrs[i][2]);
-    uint32_t color = strip.Color(seen_macs[i][5],seen_macs[i][4],seen_macs[i][3]);
-    strip.setPixelColor(i-first, color);
+    uint32_t color=0;
+    
+    if(i>seen)color=strip.Color(0,0,0);
+    else color = strip.Color(seen_macs[(first+i)%MAX_MACS][5],seen_macs[(first+i)%MAX_MACS][4],seen_macs[(first+i)%MAX_MACS][3]);
+    strip.setPixelColor(i, color);
   }
 
   strip.show();
