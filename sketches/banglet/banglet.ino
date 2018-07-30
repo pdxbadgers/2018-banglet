@@ -126,6 +126,9 @@ void setup()
   Serial.println("Welcome to your Banglet!");
   Serial.println("---------------------------\n");
 
+  // setup strip
+  stripInit();
+
   // Config the peripheral connection with maximum bandwidth 
   // more SRAM required by SoftDevice
   // Note: All config***() function must be called before begin()
@@ -181,6 +184,19 @@ void startAdv(void)
   Bluefruit.Advertising.setFastTimeout(30);      // number of seconds in fast mode
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
 }
+
+// show that the strip is on
+void stripInit(){
+  strip.begin();
+  for(int i=0;i<strip.numPixels(); i++){
+    strip.setPixelColor(i, strip.Color(255, 0, 0));
+    strip.show();
+    delay(100);
+    strip.setPixelColor(i, strip.Color(0, 0, 0));
+    strip.show();
+  }
+}
+
 
 // find mac addresses
 int find_mac(uint8_t* mac)
