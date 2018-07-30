@@ -51,8 +51,8 @@ BLEUart bleuart;
 // List of commands
 // Add command name here and make sure the MAX_COMM value matches the number of commands
 const int MAX_COMM_LEN = 10;
-const int MAX_COMM = 6;
-const char commands[MAX_COMM][MAX_COMM_LEN] = {"list", "rainbow", "patriot", "off", "scan", "frozen"};
+const int MAX_COMM = 7;
+const char commands[MAX_COMM][MAX_COMM_LEN] = {"list", "rainbow", "patriot", "off", "scan", "frozen", "devices"};
 
 
 // BT device scan
@@ -299,9 +299,9 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
  */
 void parseCommand(uint8_t *buf, int bufsize)
 {
-  for(int i=0; i<bufsize; i++){
-    Serial.write(buf[i]); 
-  }
+  //for(int i=0; i<bufsize; i++){
+  //  Serial.write(buf[i]); 
+  //}
   if(buf[0] == '/'){
     int index = getCommand(buf);
     if(index != -1)
@@ -336,9 +336,9 @@ int getCommand(uint8_t *buf)
   //go through each command
   for(int i=0; i<MAX_COMM; i++)
   {
-    Serial.println(commands[i]);
-    Serial.println((char *)buf);
-    Serial.println(buf_end);
+    //Serial.println(commands[i]);
+    //Serial.println((char *)buf);
+    //Serial.println(buf_end);
     //check if the buffer command is the same
     if(strncmp(commands[i], (char *)++buf, buf_end) == 0)
     {
@@ -360,6 +360,7 @@ void doOption(int index)
   if(index == 3) off();
   if(index == 4) scan();
   if(index == 5) frozen();
+  if(index == 6) devices();
 }
 
 
@@ -541,5 +542,31 @@ void blueScaleFade(uint8_t wait)
   }
   strip.show();
   delay(wait);
+}
+
+//show device names
+void devices()
+{
+  bleuart.write("List of nearby devices:\n");
+  bleuart.flush();
+  while(bleuart.peek() == -1) listNames();
+}
+
+void listNames()
+{
+  for ( int i = 0 ; i < seen; ++i)
+  {
+    char macbuf[20];
+    char namebuf[32];
+    memset(macbuf,0,20);
+    memset(namebuf,0,32);
+
+    sprintf(macbuf,"%02X:%02X:%02X:%02X:%02X:%02X ",seen_macs[i][5],seen_macs[i][4],seen_macs[i][3],seen_macs[i][2],seen_macs[i][1],seen_macs[i][0]);
+    sprintf(namebuf,"%s\n",seen_names[i]);
+    Serial.printBufferReverse(seen_macs[i], 6, ':');
+
+    bleuart.write(macbuf);
+    bleuart.write(namebuf);
+  }
 }
 
