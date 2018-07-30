@@ -52,7 +52,7 @@ void setup()
   }
   
   strip.begin();
-  strip.setBrightness(16);
+  strip.setBrightness(32);
   strip.show(); // Initialize all pixels to 'off'
 
   // Initialize blinkTimer for 1000 ms and start it
@@ -76,6 +76,7 @@ void setup()
   char banglet_name[32];
   memset(banglet_name,0,32);
   sprintf(banglet_name,"503BANGLET %s",getMcuUniqueID());
+  banglet_name[15]=0; // STOMP
   Bluefruit.setName(banglet_name);
   
   //Bluefruit.setName(getMcuUniqueID()); // useful testing with multiple central connections
