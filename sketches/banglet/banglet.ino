@@ -115,8 +115,7 @@ const String st[] = {"Street",
 void setup()
 {
   // create banglet's name
-  
-  randomSeed(analogRead(UNCONNECTED));
+  randomSeed(uint32_t(getMcuUniqueID()));
   String leading = "503 ";
   String banglet_name = leading + direc[random(0, 8)] + " " + loc[random(0,26)] + " " + st[random(0, 4)];
   char char_b_name[30];
