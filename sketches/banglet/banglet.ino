@@ -68,59 +68,46 @@ uint8_t* seen_macs[MAX_MACS];
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
 // unique names
-const String first[] = {"Blubberbutt",
-                        "Benedict",
-                        "Benadryl",
-                        "Benchathis",
-                        "Bonapart",
-                        "Brokenbrick",
-                        "Boppinstick",
-                        "Benefit",
-                        "Sissorkick",
-                        "Backitup",
-                        "Beezlebub",
-                        "Burgerking",
-                        "Blenderdick",
-                        "Billiardball",
-                        "Guiltyverdict",
-                        "Beaniebaby",
-                        "Pythondict",
-                        "Carrotstick",
-                        "Baseballmitt",
-                        "SpectreMelt",
-                        "Bunsenburner",
-                        "Bengaltiger",
-                        "Budapest",
-                        "Bubbagump",
-                        "Happypath",
-                        "Badgerlife"};
+const String direc[] = {"NE",
+                        "NW",
+                        "SE",
+                        "SW",
+                        "N",
+                        "S",
+                        "E",
+                        "W"};
 
-const String second[] = {"Calldispatch",
-                         "Cunningscratch",
-                         "Cumberbadge",
-                         "Lumberjack",
-                         "Bandersnatch",
-                         "Flubbercrack",
-                         "Cumberbatch",
-                         "Cuttlefish",
-                         "Mantishrimp",
-                         "Slumberbelch",
-                         "Cupboardlatch",
-                         "Combyourthatch",
-                         "Snootybrat",
-                         "Cricketbat",
-                         "Johnnycash",
-                         "Zuckerberg",
-                         "Custardbatch",
-                         "Thundercat",
-                         "Alderan",
-                         "Candygram",
-                         "Uptoscratch",
-                         "Benderbadge",
-                         "Compassmap",
-                         "Memoryleak",
-                         "Bustarhymes",
-                         "Covertrack"};
+const String loc[] = {"Alder",
+                      "Beech",
+                      "Couch",
+                      "Dekum",
+                      "Everett",
+                      "Flanders",
+                      "Glisan",
+                      "Hoyt",
+                      "Irving",
+                      "Jarret",
+                      "Kirby",
+                      "Lovejoy",
+                      "Monroe",
+                      "Northrup",
+                      "Overton",
+                      "Pettygrove",
+                      "Quimby",
+                      "Raleigh",
+                      "Shaver",
+                      "Thurman",
+                      "Upshur",
+                      "Vaungh",
+                      "Wilson",
+                      "Xray",
+                      "York",
+                      "Zebra"};
+
+const String st[] = {"Street",
+                     "Avenue",
+                     "Way",
+                     "Place"};
 
 /*
  * Initial setup
@@ -128,10 +115,13 @@ const String second[] = {"Calldispatch",
 void setup()
 {
   // create banglet's name
+  
   randomSeed(analogRead(UNCONNECTED));
-  String banglet_name = first[random(0, 26)] + " " + second[random(0,26)];
+  String leading = "503 ";
+  String banglet_name = leading + direc[random(0, 8)] + " " + loc[random(0,26)] + " " + st[random(0, 4)];
   char char_b_name[30];
   banglet_name.toCharArray(char_b_name, 30);
+
   // setup serial
   Serial.begin(115200);
   Serial.println("Welcome to your Banglet!");
