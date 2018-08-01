@@ -313,7 +313,11 @@ void parseCommand(String command)
   else if(command.equals("scan"))scan();
   else if(command.equals("frozen"))frozen();    
   else if(command.equals("devices"))devices();    
-  else if(command.equals("count"))counts();    
+  else if(command.equals("count"))counts();
+  else if(command.equals("bright"))strip.setBrightness(16);
+  else if(command.equals("brighter"))strip.setBrightness(32);
+  else if(command.equals("brightest"))strip.setBrightness(64);
+  else if(command.equals("blinding"))strip.setBrightness(128);
   else
   {
     bleuart.write("Unknown command, ");
