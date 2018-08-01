@@ -86,31 +86,29 @@ const String direc[] = {"NE",
                         "W"};
 
 const String loc[] = {"Alder",
-                      "Beech",
+                      "Burnside",
                       "Couch",
-                      "Dekum",
+                      "Davis",
                       "Everett",
                       "Flanders",
                       "Glisan",
                       "Hoyt",
                       "Irving",
-                      "Jarret",
+                      "Johnson",
                       "Kirby",
                       "Lovejoy",
-                      "Monroe",
+                      "Marshall",
                       "Northrup",
                       "Overton",
                       "Pettygrove",
                       "Quimby",
                       "Raleigh",
-                      "Shaver",
+                      "Savier",
                       "Thurman",
                       "Upshur",
-                      "Vaungh",
+                      "Vaughn",
                       "Wilson",
-                      "Xray",
-                      "York",
-                      "Zebra"};
+                      "York"};
 
 const String st[] = {"Street",
                      "Avenue",
@@ -125,7 +123,7 @@ void setup()
   // create banglet's name
   randomSeed(uint32_t(getMcuUniqueID()));
   String leading = "503 ";
-  String banglet_name = leading + direc[random(0, 8)] + " " + loc[random(0,26)] + " " + st[random(0, 4)];
+  String banglet_name = leading + direc[random(0, 8)] + " " + loc[random(0,24)] + " " + st[random(0, 4)];
   char char_b_name[30];
   banglet_name.toCharArray(char_b_name, 30);
 
