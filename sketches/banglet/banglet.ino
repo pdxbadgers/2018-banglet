@@ -552,9 +552,9 @@ void blueScaleFade(uint8_t wait)
 //show device names
 void devices()
 {
-  bleuart.write("List of nearby devices:\n");
+  bleuart.write("Detected Bluetooth devices:\n");
   bleuart.flush();
-  while(bleuart.peek() == -1) listNames();
+  listNames();
 }
 
 void listNames()
@@ -578,9 +578,8 @@ void listNames()
 //show number of devices
 void counts()
 {
-  bleuart.write("Number of nearby devices:\n");
   bleuart.flush();
-  while(bleuart.peek() == -1) numDevices();
+  numDevices();
 }
 
 void numDevices()
