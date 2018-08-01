@@ -47,6 +47,7 @@
 // BLE Service
 BLEUart bleuart;
 
+String mode="scan"; // set the default mode
 
 // List of commands
 // Add command name here and make sure the MAX_COMM value matches the number of commands
@@ -276,6 +277,13 @@ void loop()
     parseCommand(command);
   }
 
+  if(mode.equals("scan"))btscan();
+  else if(mode.equals("rainbow"))rainbow(10, 1);
+  else if(mode.equals("patriot"))patriot();
+  else if(mode.equals("off"))turnOff();
+  else if(mode.equals("frozen"))blueScaleFade(200);    
+  else btscan(); // I guess scan should be the default
+
   // Request CPU to enter low-power mode until an event/interrupt occurs
   waitForEvent();
 }
@@ -307,13 +315,17 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 void parseCommand(String command)
 {
   if(command.equals("help"))listCommands();
+  else if(command.equals("devices"))devices();    
+  else if(command.equals("count"))counts();
+
+  // some LED modes
   else if(command.equals("rainbow"))rainbow();
-  else if(command.equals("patriot"))patriot();
+  else if(command.equals("patriot"))setPatriot();
   else if(command.equals("off"))off();
   else if(command.equals("scan"))scan();
   else if(command.equals("frozen"))frozen();    
-  else if(command.equals("devices"))devices();    
-  else if(command.equals("count"))counts();
+
+  // brightness options
   else if(command.equals("bright"))strip.setBrightness(16);
   else if(command.equals("brighter"))strip.setBrightness(32);
   else if(command.equals("brightest"))strip.setBrightness(64);
@@ -342,32 +354,32 @@ void listCommands()
   }
 }
 
+void setPatriot()
+{
+  bleuart.write("USA! USA!\n");
+  mode="patriot";
+}
+
 // red, white and blue lights
+int patriot_counter=0;
 void patriot()
 {
-
-  bleuart.write("USA! USA!\n");
   // light up strip with red, white and blue
-  int counter=0;
   uint32_t red=strip.Color(255,0,0);
   uint32_t white=strip.Color(255,255,255);
   uint32_t blue=strip.Color(0,0,255);
-  bleuart.flush();
-  while(bleuart.peek() == -1)
+
+  for (int i = 0; i < strip.numPixels(); i+=3)
   {
-    for (int i = 0; i < strip.numPixels(); i+=3)
-    {
-      strip.setPixelColor((i+counter)%15,red);
-      strip.setPixelColor((i+counter+1)%15,white);
-      strip.setPixelColor((i+counter+2)%15,blue);
-    }
-
-    counter = (counter+1)%3;
-
-    strip.show();
-    delay(200);
+    strip.setPixelColor((i+patriot_counter)%15,red);
+    strip.setPixelColor((i+patriot_counter+1)%15,white);
+    strip.setPixelColor((i+patriot_counter+2)%15,blue);
   }
 
+  patriot_counter = (patriot_counter+1)%3;
+
+  strip.show();
+  delay(200);
 }
 
 // rainbow lights
@@ -375,7 +387,7 @@ void rainbow()
 {
   bleuart.write("Ooo! Rainbow!\n");
   bleuart.flush();
-  while(bleuart.peek() == -1) rainbow(10, 1);
+  mode="rainbow";
 }
 
 void rainbow(uint8_t wait, int rainbowLoops)
@@ -435,7 +447,7 @@ uint8_t blue(uint32_t c) {
 void off()
 {
   bleuart.write("Turning off the lights\n");
-  turnOff();
+  mode="off";
 }
 
 void turnOff()
@@ -445,6 +457,7 @@ void turnOff()
     strip.setPixelColor(i, 0, 0, 0);
   }
   strip.show();
+  delay(1000); // sleeping is important
 }
 
 // scan close by BT devices
@@ -454,12 +467,11 @@ void scan()
   bleuart.write("Showing nearby ");
   bleuart.write("bluetooth devices...\n");
   bleuart.flush();
-  while(bleuart.peek() == -1) btscan();
+  mode="scan";
 }
 
 void btscan()
 {
-
   delay(1000);
   int first=0;
   if(seen>12)first=seen-12;
@@ -481,7 +493,7 @@ void frozen()
 {
   bleuart.write("Let it go!\n");
   bleuart.flush();
-  while(bleuart.peek() == -1) blueScaleFade(200);
+  mode="frozen";
 }
 
 void blueScaleFade(uint8_t wait)
