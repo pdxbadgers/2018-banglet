@@ -268,8 +268,8 @@ void loop()
   else if(mode.equals("rainbow"))rainbow(10, 1);
   else if(mode.equals("patriot"))patriot();
   else if(mode.equals("off"))turnOff();
-  else if(mode.equals("frozen"))blueScaleFade(200);    
-  else if(mode.equals("fire"))redScaleFade(200);    
+  else if(mode.equals("frozen"))blueScaleFade(200);
+  else if(mode.equals("fire"))redScaleFade(200);
   else btscan(); // I guess scan should be the default
 
   // Request CPU to enter low-power mode until an event/interrupt occurs
@@ -303,17 +303,17 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 void parseCommand(String command)
 {
   if(command.equals("help"))listCommands();
-  else if(command.equals("devices"))listDevices();    
+  else if(command.equals("devices"))listDevices();
   else if(command.equals("count"))numDevices();
   else if(command.equals("modes"))listModes();
-  
+
   // some LED modes
   else if(command.equals("scan"))scan();
   else if(command.equals("off"))off();
   else if(command.equals("rainbow"))rainbow();
   else if(command.equals("patriot"))setPatriot();
   else if(command.equals("frozen"))frozen();
-  else if(command.equals("fire"))fire(); 
+  else if(command.equals("fire"))fire();
 
   // just for fun
   else if(command.equals("id")){bleuart.write("uid=0(root) gid=0(root)");bleuart.write("groups=0(root)\n");}
@@ -341,13 +341,13 @@ void listCommands()
 {
   bleuart.write("help: You're looking");
   bleuart.write(" at it.\n");
-  
+
   bleuart.write("devices: List known");
   bleuart.write(" devices.\n");
-  
+
   bleuart.write("count: List number of");
   bleuart.write(" devices.\n");
-  
+
   bleuart.write("modes: List banglet");
   bleuart.write(" display modes.\n");
 }
@@ -372,7 +372,7 @@ void listModes()
     bleuart.write("???: unlock at lvl 10\n");
     return;
   }
-  
+
   bleuart.write("patriot: OMG USA!\n");
 
   if(seen<15)
@@ -391,7 +391,7 @@ void listModes()
   }
 
   bleuart.write("fire: Halt and");
-  bleuart.write(" catch fire.\n");  
+  bleuart.write(" catch fire.\n");
 
   if(seen<30)
   {
