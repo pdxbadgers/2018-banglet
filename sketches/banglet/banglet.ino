@@ -52,13 +52,13 @@ BLEUart bleuart;
 // Add command name here and make sure the MAX_COMM value matches the number of commands
 const int MAX_COMM = 8;
 const String commands[MAX_COMM] = {"list",
-				   "rainbow",
-				   "patriot",
-				   "off",
-				   "scan",
-				   "frozen",
-				   "devices",
-				   "counts"};
+           "rainbow",
+           "patriot",
+           "off",
+           "scan",
+           "frozen",
+           "devices",
+           "counts"};
 
 
 // BT device scan
@@ -268,9 +268,12 @@ void loop()
   // Forward from BLEUART to HW Serial
   while ( bleuart.available() )
   {
-    uint8_t rx_buf[64];
+    char rx_buf[64];
+    memset(rx_buf,0,sizeof(rx_buf));
     int rx_size = bleuart.read(rx_buf, sizeof(rx_buf));
-    parseCommand(rx_buf, rx_size);
+    String command = String(rx_buf);
+    command.trim();
+    parseCommand(command);
   }
 
   // Request CPU to enter low-power mode until an event/interrupt occurs
@@ -301,73 +304,23 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 /*
  * Main Banglet functions that parses the send messages and does things with it
  */
-void parseCommand(uint8_t *buf, int bufsize)
+void parseCommand(String command)
 {
-  //for(int i=0; i<bufsize; i++){
-  //  Serial.write(buf[i]);
-  //}
-  if(buf[0] == '/'){
-    int index = getCommand(buf);
-    if(index != -1)
-    {
-      doOption(index);
-    }else{
-      bleuart.write("Invalid option\n");
-    }
-  }else{
-    bleuart.write("Send /list for list of ");
-    bleuart.write("commands. All commands ");
-    bleuart.write("start with /\n");
-  }
-}
-
-// Return the index of the commands user entered
-// If not there return -1
-int getCommand(uint8_t *buf)
-{
-  int buf_end = 1;
-  while(buf[buf_end] != '\n')
+  if(command.equals("help"))listCommands();
+  else if(command.equals("rainbow"))rainbow();
+  else if(command.equals("patriot"))patriot();
+  else if(command.equals("off"))off();
+  else if(command.equals("scan"))scan();
+  else if(command.equals("frozen"))frozen();    
+  else if(command.equals("devices"))devices();    
+  else if(command.equals("count"))counts();    
+  else
   {
-    Serial.println((char)buf[buf_end]);
-    buf_end++;
+    bleuart.write("Unknown command, ");
+    bleuart.write("type 'help' for help.\n");
   }
-  // This is assuming the EOL character is a newline
-  // This will not work for any other case
-  // The default for the Adafruit UART interface is '\n'
-  buf_end = buf_end - 1;
-  //Serial.println(buf_end);
-
-  //go through each command
-  for(int i=0; i<MAX_COMM; i++)
-  {
-    //Serial.println(commands[i]);
-    //Serial.println((char *)buf);
-    //Serial.println(buf_end);
-    //check if the buffer command is the same
-    if(strncmp(commands[i].c_str(), (char *)++buf, buf_end) == 0)
-    {
-      return i;
-    }else{
-      --buf;
-    }
-  }
-
-  return -1;
+  bleuart.write("\n# ");
 }
-
-// Switch between functions
-void doOption(int index)
-{
-  if(index == 0) listCommands();
-  if(index == 1) rainbow();
-  if(index == 2) patriot();
-  if(index == 3) off();
-  if(index == 4) scan();
-  if(index == 5) frozen();
-  if(index == 6) devices();
-  if(index == 7) counts();
-}
-
 
 /*
  * All the things Banglet can do
