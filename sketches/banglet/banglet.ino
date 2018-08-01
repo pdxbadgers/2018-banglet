@@ -39,6 +39,7 @@
 
 #include <bluefruit.h>
 #include <Adafruit_NeoPixel.h>
+#include "wdt.h"
 
 /*
  * Global
@@ -107,6 +108,9 @@ const String st[] = {"Street",
  */
 void setup()
 {
+  // turn off watchdog during setup
+  wdt_disable();
+  
   // create banglet's name
   randomSeed(uint32_t(getMcuUniqueID()));
   String leading = "503 ";
@@ -158,6 +162,9 @@ void setup()
 
   Serial.println("Please use the Adafruit Bluefruit app or the Serial Bluetooth Terminal app to connect to the Banglet");
   Serial.println("Once connected, send /list for a list of commands you can send");
+
+  // set up the watchdog
+  wdt_enable(WDTO_8S);
 }
 
 // advertise peripheral BLEUART service
@@ -253,6 +260,9 @@ void scan_callback(ble_gap_evt_adv_report_t* report)
  */
 void loop()
 {
+  wdt_reset(); // kick the watchdog timer
+  delay(200);  // short nap
+  
   // Forward from BLEUART to HW Serial
   while ( bleuart.available() )
   {
@@ -513,7 +523,6 @@ void turnOff()
     strip.setPixelColor(i, 0, 0, 0);
   }
   strip.show();
-  delay(1000); // sleeping is important
 }
 
 // scan close by BT devices
@@ -528,7 +537,6 @@ void scan()
 
 void btscan()
 {
-  delay(1000);
   int first=0;
   if(seen>12)first=seen-12;
 
