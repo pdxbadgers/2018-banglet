@@ -40,6 +40,7 @@
 #include <bluefruit.h>
 #include <Adafruit_NeoPixel.h>
 #include "wdt.h"
+#include "CRC32.h"
 
 /*
  * Global
@@ -111,17 +112,24 @@ void setup()
   // turn off watchdog during setup
   wdt_disable();
   
+  // setup serial
+  Serial.begin(115200);
+  Serial.println("Welcome to your Banglet!");
+  Serial.println("---------------------------\n");
+
+
   // create banglet's name
-  randomSeed(uint32_t(getMcuUniqueID()));
+  char* uniqueID = (char*)getMcuUniqueID();
+  Serial.printf("id: %s\n",uniqueID);
+  uint32_t checksum = CRC32::calculate((const char*)(uniqueID), strlen(uniqueID));
+  Serial.printf("checksum: %u\n",checksum);
+  randomSeed(checksum);
+  
   String leading = "503 ";
   String banglet_name = leading + direc[random(0, 8)] + " " + loc[random(0,24)] + " " + st[random(0, 4)];
   char char_b_name[30];
   banglet_name.toCharArray(char_b_name, 30);
 
-  // setup serial
-  Serial.begin(115200);
-  Serial.println("Welcome to your Banglet!");
-  Serial.println("---------------------------\n");
 
   // setup strip
   stripInit();
@@ -152,6 +160,7 @@ void setup()
   // Start Central Scan
   Bluefruit.setConnLedInterval(250);
   Bluefruit.Scanner.setRxCallback(scan_callback);
+  Bluefruit.Scanner.filterRssi(-80);
   Bluefruit.Scanner.start(0);
 
   // Configure and Start BLE Uart Service
