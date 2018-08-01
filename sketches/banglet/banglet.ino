@@ -49,19 +49,6 @@ BLEUart bleuart;
 
 String mode="scan"; // set the default mode
 
-// List of commands
-// Add command name here and make sure the MAX_COMM value matches the number of commands
-const int MAX_COMM = 8;
-const String commands[MAX_COMM] = {"list",
-           "rainbow",
-           "patriot",
-           "off",
-           "scan",
-           "frozen",
-           "devices",
-           "counts"};
-
-
 // BT device scan
 uint seen=0;
 const byte MAX_MACS = 24;
@@ -282,6 +269,7 @@ void loop()
   else if(mode.equals("patriot"))patriot();
   else if(mode.equals("off"))turnOff();
   else if(mode.equals("frozen"))blueScaleFade(200);    
+  else if(mode.equals("fire"))redScaleFade(200);    
   else btscan(); // I guess scan should be the default
 
   // Request CPU to enter low-power mode until an event/interrupt occurs
@@ -315,15 +303,20 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 void parseCommand(String command)
 {
   if(command.equals("help"))listCommands();
-  else if(command.equals("devices"))devices();    
-  else if(command.equals("count"))counts();
-
+  else if(command.equals("devices"))listDevices();    
+  else if(command.equals("count"))numDevices();
+  else if(command.equals("modes"))listModes();
+  
   // some LED modes
+  else if(command.equals("scan"))scan();
+  else if(command.equals("off"))off();
   else if(command.equals("rainbow"))rainbow();
   else if(command.equals("patriot"))setPatriot();
-  else if(command.equals("off"))off();
-  else if(command.equals("scan"))scan();
-  else if(command.equals("frozen"))frozen();    
+  else if(command.equals("frozen"))frozen();
+  else if(command.equals("fire"))fire(); 
+
+  // just for fun
+  else if(command.equals("id")){bleuart.write("uid=0(root) gid=0(root)");bleuart.write("groups=0(root)\n");}
 
   // brightness options
   else if(command.equals("bright"))strip.setBrightness(16);
@@ -346,13 +339,72 @@ void parseCommand(String command)
 // list all commands
 void listCommands()
 {
-  bleuart.write("List of commands:\n");
-  for(int i=0; i<MAX_COMM; i++)
+  bleuart.write("help: You're looking");
+  bleuart.write(" at it.\n");
+  
+  bleuart.write("devices: List known");
+  bleuart.write(" devices.\n");
+  
+  bleuart.write("count: List number of");
+  bleuart.write(" devices.\n");
+  
+  bleuart.write("modes: List banglet");
+  bleuart.write(" display modes.\n");
+}
+
+// list all modes
+void listModes()
+{
+  bleuart.write("scan: Show bt");
+  bleuart.write(" devices.\n");
+
+  if(seen<5)
   {
-    bleuart.write(commands[i].c_str());
-    bleuart.write('\n');
+    bleuart.write("???: unlock at lvl 5\n");
+    return;
+  }
+
+  bleuart.write("off: Absolutely");
+  bleuart.write(" nothing!\n");
+
+  if(seen<10)
+  {
+    bleuart.write("???: unlock at lvl 10\n");
+    return;
+  }
+  
+  bleuart.write("patriot: OMG USA!\n");
+
+  if(seen<15)
+  {
+    bleuart.write("???: unlock at lvl 15\n");
+    return;
+  }
+
+  bleuart.write("frozen: Only one way");
+  bleuart.write(" to find out.\n");
+
+  if(seen<20)
+  {
+    bleuart.write("???: unlock at lvl 20\n");
+    return;
+  }
+
+  bleuart.write("fire: Halt and");
+  bleuart.write(" catch fire.\n");  
+
+  if(seen<30)
+  {
+    bleuart.write("bright/brighter");
+    bleuart.write("/brightest\n");
+    return;
+  }
+  if(seen<50)
+  {
+    bleuart.write("blinding\n");
   }
 }
+
 
 void setPatriot()
 {
@@ -518,15 +570,39 @@ void blueScaleFade(uint8_t wait)
   delay(wait);
 }
 
-//show device names
-void devices()
+//frozen
+void fire()
 {
-  bleuart.write("Detected Bluetooth devices:\n");
+  bleuart.write("Flame on!\n");
   bleuart.flush();
-  listNames();
+  mode="fire";
 }
 
-void listNames()
+
+void redScaleFade(uint8_t wait)
+{
+  //loop through fade values
+
+  // divide the neopixel strip into 3 equal parts
+  for(int i=0; i< strip.numPixels(); i=i+3)
+  {
+    // find a color for this set
+     uint32_t color = strip.Color(random(192, 256), random(0, 64), random(0, 32));
+     // set the color
+     for(int j=i; j<i+3; j++)
+     {
+        if(j<strip.numPixels())
+        {
+          strip.setPixelColor(j, color);
+        }
+     }
+  }
+  strip.show();
+  delay(wait);
+}
+
+//show device names
+void listDevices()
 {
   for ( int i = 0 ; i < seen; ++i)
   {
@@ -545,16 +621,10 @@ void listNames()
 }
 
 //show number of devices
-void counts()
-{
-  bleuart.flush();
-  numDevices();
-}
-
 void numDevices()
 {
   char outbuf[20];
   memset(outbuf,0,20);
-  sprintf(outbuf,"%d Devices Logged\n",seen);
+  sprintf(outbuf,"Devices Seen: %d\n",seen);
   bleuart.write(outbuf);
 }
