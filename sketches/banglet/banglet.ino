@@ -357,6 +357,7 @@ void listModes()
 {
   bleuart.write("scan: Show bt");
   bleuart.write(" devices.\n");
+  bleuart.write("off: No lights\n");
 
   if(seen<5)
   {
@@ -365,8 +366,8 @@ void listModes()
     return;
   }
 
-  bleuart.write("off: No lights\n");
-
+  bleuart.write("patriot: OMG USA!\n");
+  
   if(seen<10)
   {
     bleuart.write("???: unlock at level 10\n");
@@ -374,7 +375,7 @@ void listModes()
     return;
   }
 
-  bleuart.write("patriot: OMG USA!\n");
+  bleuart.write("rainbow: blink the rainbow\n");
 
   if(seen<15)
   {
