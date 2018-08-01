@@ -14,26 +14,26 @@
 
 /*********************************************************************
  * Thank you, Adafruit Industries for the examples!
- * 
+ *
  * This is the sketch that makes the Banglet work
  * It came from https://github.com/pdxbadgers/2018-banglet/
  * There are other sketches there so if you would like to flash the
  * other ones to see what they do or try to hack on your banglet, feel
  * free to clone the project and follow the instructions
- * 
+ *
  * This code is released under the MIT license and is provided as is
  * with no warranties or guarantees or assurances, so use at your own
  * risk. That means, don't blame us if your banglet catches fire.
- * 
+ *
  * This is meant to be used with either the Adafruit Bluefruit LE app
  * or the Serial Bluetooth Terminal. It takes advantage of Nordic's
  * proprietary UART service, allowing you to interact with the banglet
  * using a 'shell'. You can find these apps at the Android play store
  * (I am not sure about iOS but I am guessing you can find an equivalent)
- * 
+ *
  * Once you connect to the banglet, you can list all the commands by sending
  * '/list' through the terminal.
- * 
+ *
  * Happy Hacking!
  ************************************************************************/
 
@@ -138,14 +138,14 @@ void setup()
   for(int i=0;i<MAX_MACS;++i)
   {
     uint8_t* new_thing = new uint8_t[6];
-    uint8_t* new_name  = new uint8_t[32];  
+    uint8_t* new_name  = new uint8_t[32];
     memset(new_thing,0,6);
     memset(new_name,0,32);
     seen_macs[i]=new_thing;
     seen_names[i]=new_name;
   }
 
-  // Config the peripheral connection with maximum bandwidth 
+  // Config the peripheral connection with maximum bandwidth
   // more SRAM required by SoftDevice
   // Note: All config***() function must be called before begin()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
@@ -185,20 +185,20 @@ void startAdv(void)
   // Secondary Scan Response packet (optional)
   // Since there is no room for 'Name' in Advertising packet
   Bluefruit.ScanResponse.addName();
-  
+
   /* Start Advertising
    * - Enable auto advertising if disconnected
    * - Interval:  fast mode = 20 ms, slow mode = 152.5 ms
    * - Timeout for fast mode is 30 seconds
    * - Start(timeout) with timeout = 0 will advertise forever (until connected)
-   * 
+   *
    * For recommended advertising interval
-   * https://developer.apple.com/library/content/qa/qa1931/_index.html   
+   * https://developer.apple.com/library/content/qa/qa1931/_index.html
    */
   Bluefruit.Advertising.restartOnDisconnect(true);
   Bluefruit.Advertising.setInterval(32, 244);    // in unit of 0.625 ms
   Bluefruit.Advertising.setFastTimeout(30);      // number of seconds in fast mode
-  Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
+  Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds
 }
 
 // show that the strip is on
@@ -236,17 +236,17 @@ int find_mac(uint8_t* mac)
 // addresses in a readable way
 void scan_callback(ble_gap_evt_adv_report_t* report)
 {
-  uint8_t new_thing[6]; 
+  uint8_t new_thing[6];
   memcpy(new_thing,report->peer_addr.addr,6);
   //Serial.println("copied MAC buffer");
-  
+
   // which device is this?
   //Serial.println("finding thing");
   int thing = find_mac(new_thing);
   //Serial.printf("found thing %d\n",thing);
 
   uint8_t new_name[32];
-  memset(new_name,0,32); 
+  memset(new_name,0,32);
   if(Bluefruit.Scanner.parseReportByType(report, BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME, new_name, 32))
   {
     if(strlen((char*)new_name)>0)
@@ -304,7 +304,7 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 void parseCommand(uint8_t *buf, int bufsize)
 {
   //for(int i=0; i<bufsize; i++){
-  //  Serial.write(buf[i]); 
+  //  Serial.write(buf[i]);
   //}
   if(buf[0] == '/'){
     int index = getCommand(buf);
@@ -336,7 +336,7 @@ int getCommand(uint8_t *buf)
   // The default for the Adafruit UART interface is '\n'
   buf_end = buf_end - 1;
   //Serial.println(buf_end);
-  
+
   //go through each command
   for(int i=0; i<MAX_COMM; i++)
   {
@@ -388,7 +388,7 @@ void listCommands()
 // red, white and blue lights
 void patriot()
 {
-  
+
   bleuart.write("USA! USA!\n");
   // light up strip with red, white and blue
   int counter=0;
@@ -406,7 +406,7 @@ void patriot()
     }
 
     counter = (counter+1)%3;
-  
+
     strip.show();
     delay(200);
   }
@@ -427,7 +427,7 @@ void rainbow(uint8_t wait, int rainbowLoops)
   int redVal, greenVal, blueVal;
 
   for(int k = 0 ; k < rainbowLoops ; k ++){
-    
+
     for(int j=0; j<256; j++) { // 5 cycles of all colors on wheel
 
       for(int i=0; i< strip.numPixels(); i++) {
@@ -445,7 +445,7 @@ void rainbow(uint8_t wait, int rainbowLoops)
         strip.show();
         delay(wait);
     }
-  
+
   }
 }
 
@@ -502,15 +502,15 @@ void scan()
 
 void btscan()
 {
-  
+
   delay(1000);
   int first=0;
   if(seen>12)first=seen-12;
-  
+
   for ( uint i=0 ; i < 12; ++i)
   {
     uint32_t color=0;
-    
+
     if(i>seen)color=strip.Color(0,0,0);
     else color = strip.Color(seen_macs[(first+i)%MAX_MACS][5],seen_macs[(first+i)%MAX_MACS][4],seen_macs[(first+i)%MAX_MACS][3]);
     strip.setPixelColor(i, color);
@@ -530,7 +530,7 @@ void frozen()
 void blueScaleFade(uint8_t wait)
 {
   //loop through fade values
-  
+
   // divide the neopixel strip into 3 equal parts
   for(int i=0; i< strip.numPixels(); i=i+3)
   {
@@ -590,4 +590,3 @@ void numDevices()
   sprintf(outbuf,"%d Devices Logged\n",seen);
   bleuart.write(outbuf);
 }
-
