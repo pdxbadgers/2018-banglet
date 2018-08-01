@@ -50,16 +50,15 @@ BLEUart bleuart;
 
 // List of commands
 // Add command name here and make sure the MAX_COMM value matches the number of commands
-const int MAX_COMM_LEN = 10;
 const int MAX_COMM = 8;
-const char commands[MAX_COMM][MAX_COMM_LEN] = {"list",
-                                               "rainbow",
-                                               "patriot",
-                                               "off",
-                                               "scan",
-                                               "frozen",
-                                               "devices",
-                                               "counts"};
+const String commands[MAX_COMM] = {"list",
+				   "rainbow",
+				   "patriot",
+				   "off",
+				   "scan",
+				   "frozen",
+				   "devices",
+				   "counts"};
 
 
 // BT device scan
@@ -345,7 +344,7 @@ int getCommand(uint8_t *buf)
     //Serial.println((char *)buf);
     //Serial.println(buf_end);
     //check if the buffer command is the same
-    if(strncmp(commands[i], (char *)++buf, buf_end) == 0)
+    if(strncmp(commands[i].c_str(), (char *)++buf, buf_end) == 0)
     {
       return i;
     }else{
@@ -381,7 +380,7 @@ void listCommands()
   bleuart.write("List of commands:\n");
   for(int i=0; i<MAX_COMM; i++)
   {
-    bleuart.write(commands[i]);
+    bleuart.write(commands[i].c_str());
     bleuart.write('\n');
   }
 }
