@@ -41,3 +41,7 @@ Sketch > Include Libraries > Manage Libraries
 
 Adafruit Neo Pixel
 
+
+You will need 32 bit glibc
+and install nrfutil
+
