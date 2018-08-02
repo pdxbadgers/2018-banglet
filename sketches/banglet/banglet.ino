@@ -377,11 +377,11 @@ void listModes()
 {
   bleuart.write("scan: Show bt");
   bleuart.write(" devices.\n");
-  bleuart.write("off: No lights\n");
+  bleuart.write("off: No lights.\n");
 
   if(seen<5)
   {
-    bleuart.write("???: unlock at level 5\n");
+    bleuart.write("????: Unlock at level 5.\n");
     bleuart.write("Collect more BT devices to unlock modes!");
     return;
   }
@@ -390,16 +390,16 @@ void listModes()
   
   if(seen<10)
   {
-    bleuart.write("???: unlock at level 10\n");
+    bleuart.write("????: Unlock at level 10.\n");
     bleuart.write("Collect more BT devices to unlock modes!");
     return;
   }
 
-  bleuart.write("rainbow: blink the rainbow\n");
+  bleuart.write("rainbow: Blink the rainbow!\n");
 
   if(seen<15)
   {
-    bleuart.write("???: unlock at level 15\n");
+    bleuart.write("????: Unlock at level 15.\n");
     bleuart.write("Collect more BT devices to unlock modes!");
     return;
   }
@@ -409,7 +409,7 @@ void listModes()
 
   if(seen<20)
   {
-    bleuart.write("???: unlock at level 20\n");
+    bleuart.write("????: Unlock at level 20.\n");
     bleuart.write("Collect more BT devices to unlock modes!");
     return;
   }
