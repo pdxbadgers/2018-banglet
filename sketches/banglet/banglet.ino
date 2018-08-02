@@ -120,16 +120,17 @@ void setup()
 
   // create banglet's name
   char* uniqueID = (char*)getMcuUniqueID();
-  Serial.printf("id: %s\n",uniqueID);
+  Serial.printf("id: %s\r\n",uniqueID);
   uint32_t checksum = CRC32::calculate((const char*)(uniqueID), strlen(uniqueID));
-  Serial.printf("checksum: %u\n",checksum);
+  Serial.printf("checksum: %u\r\n",checksum);
   randomSeed(checksum);
   
   String leading = "503 ";
   String banglet_name = leading + direc[random(0, 8)] + " " + loc[random(0,24)] + " " + st[random(0, 4)];
   char char_b_name[30];
   banglet_name.toCharArray(char_b_name, 30);
-
+  Serial.printf("name: %s\r\n",char_b_name);
+  Serial.println();
 
   // setup strip
   stripInit();
@@ -160,7 +161,7 @@ void setup()
   // Start Central Scan
   Bluefruit.setConnLedInterval(250);
   Bluefruit.Scanner.setRxCallback(scan_callback);
-  Bluefruit.Scanner.filterRssi(-80);
+  //Bluefruit.Scanner.filterRssi(-80);
   Bluefruit.Scanner.start(0);
 
   // Configure and Start BLE Uart Service
